@@ -6,7 +6,7 @@ type ReportService service
 // DataReportDTO 数据指标
 type DataReportDTO struct {
 	// 基础指标
-	Fee        float64 `json:"fee,string"`        // 消费	 推广消费金额
+	Fee        float64 `json:"fee,string"`        // 消费	 推广消费金额 单位:元
 	Impression int64   `json:"impression,string"` // 展现量	推广展现量
 	Click      int64   `json:"click,string"`      // 点击量 推广点击量；视频流中「观看视频5s」记做一次点击
 	Ctr        float64 `json:"ctr,string"`        // 点击率	推广点击量/推广展现量*100%
@@ -252,8 +252,8 @@ type (
 )
 
 type (
-	// OfflineDataDTO 数据指标
-	OfflineDataDTO struct {
+	// OfflineBizField 离线报表通用业务字段
+	OfflineBizField struct {
 		Time            string `json:"time"`                       // 业务字段	时间
 		Placement       string `json:"placement,omitempty"`        // 业务字段	广告类型
 		OptimizeTarget  string `json:"optimize_target,omitempty"`  // 业务字段	优化目标
@@ -261,18 +261,34 @@ type (
 		BiddingStrategy string `json:"bidding_strategy,omitempty"` // 业务字段	出价方式
 		BuildType       string `json:"build_type,omitempty"`       // 业务字段	搭建类型
 		MarketingTarget string `json:"marketing_target,omitempty"` // 业务字段	营销诉求
-		CampaignId      string `json:"campaign_id,omitempty"`      // 业务字段	计划id
-		CampaignName    string `json:"campaign_name,omitempty"`    // 业务字段	计划名称
-		UnitId          string `json:"unit_id,omitempty"`          // 业务字段	单元id
-		UnitName        string `json:"unit_name,omitempty"`        // 业务字段	单元名称
 		PageId          string `json:"page_id,omitempty"`          // 业务字段	落地页id	带细分条件字段才有
 		ItemId          string `json:"item_id,omitempty"`          // 业务字段	商品id	带细分条件字段才有
 		LiveRedId       string `json:"live_red_id,omitempty"`      // 业务字段	直播间id	带细分条件字段才有
 		CountryName     string `json:"country_name,omitempty"`     // 业务字段	国家	带细分条件字段才有
 		Province        string `json:"province,omitempty"`         // 业务字段	省份	带细分条件字段才有
 		City            string `json:"city,omitempty"`             // 业务字段	城市	带细分条件字段才有
+	}
+
+	// OfflineDataDTO 数据指标
+	OfflineDataDTO struct {
+		OfflineBizField
+		DataReportDTO
+	}
+
+	// OfflineAccountDataDTO 表示账户层级离线报表数据
+	OfflineAccountDataDTO struct {
+		OfflineBizField
+		DataReportDTO
+	}
+
+	// OfflineCampaignDataDTO 表示计划层级离线报表数据
+	OfflineCampaignDataDTO struct {
+		OfflineBizField
 
 		DataReportDTO
+
+		CampaignId   string `json:"campaign_id"`   // 业务字段	计划id
+		CampaignName string `json:"campaign_name"` // 业务字段	计划名称
 	}
 
 	// OfflineKeywordDataDTO 表示关键词层级离线报表数据
@@ -296,6 +312,18 @@ type (
 		DataReportDTO
 	}
 
+	// OfflineUnitDataDTO 表示单元层级离线报表数据
+	OfflineUnitDataDTO struct {
+		OfflineBizField
+
+		DataReportDTO
+
+		CampaignId   string `json:"campaign_id"`        // 业务字段	计划id
+		CampaignName string `json:"campaign_name"`      // 业务字段	计划名称
+		UnitId       string `json:"unit_id,omitempy"`   // 业务字段 单元id
+		UnitName     string `json:"unit_name,omitempy"` // 业务字段 单元名称
+	}
+
 	// OfflineCreativeDTO 表示创意层级离线报表数据
 	OfflineCreativeDTO struct {
 		CampaignId      string `json:"campaign_id,omitempty"`      // 业务字段 计划id
@@ -306,17 +334,7 @@ type (
 		CreativityName  string `json:"creativity_name,omitempty"`  // 业务字段 创意名称
 		CreativityImage string `json:"creativity_image,omitempty"` // 业务字段 创意图片
 		NoteId          string `json:"note_id,omitempty"`          // 业务字段 笔记id
-		Time            string `json:"time"`                       // 业务字段	时间
-		Placement       string `json:"placement"`                  // 业务字段	广告类型
-		OptimizeTarget  string `json:"optimize_target"`            // 业务字段	优化目标
-		PromotionTarget string `json:"promotion_target"`           // 业务字段	推广标的
-		BiddingStrategy string `json:"bidding_strategy"`           // 业务字段	出价方式
-		BuildType       string `json:"build_type"`                 // 业务字段	搭建类型
-		MarketingTarget string `json:"marketing_target"`           // 业务字段	营销诉求
-		PageId          string `json:"page_id,omitempty"`          // 业务字段	落地页id	带细分条件字段才有
-		ItemId          string `json:"item_id,omitempty"`          // 业务字段	商品id	带细分条件字段才有
-		LiveRedId       string `json:"live_red_id,omitempty"`      // 业务字段	直播间id	带细分条件字段才有
-
+		OfflineBizField
 		DataReportDTO
 	}
 

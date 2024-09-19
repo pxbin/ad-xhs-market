@@ -63,8 +63,8 @@ type OfflineAccountRequest struct {
 
 // OfflineAccountData 表示聚光数据报表账户层级离线数据响应
 type OfflineAccountData struct {
-	DataList        []OfflineDataDTO `json:"data_list"`
-	AggregationData OfflineDataDTO   `json:"aggregation_data"`
+	DataList        []OfflineAccountDataDTO `json:"data_list"`
+	AggregationData OfflineAccountDataDTO   `json:"aggregation_data"`
 }
 
 // ListOfflineAccount 获取定向层级离线数据
@@ -101,8 +101,8 @@ type OfflineCampaignRequest struct {
 
 // OfflineCampaignData 表示聚光数据报表计划层级离线数据响应
 type OfflineCampaignData struct {
-	DataList        []OfflineDataDTO `json:"data_list"`
-	AggregationData OfflineDataDTO   `json:"aggregation_data"`
+	DataList        []OfflineCampaignDataDTO `json:"data_list"`
+	AggregationData OfflineCampaignDataDTO   `json:"aggregation_data"`
 }
 
 // ListOfflineCampaign 获取定向层级离线数据
@@ -139,8 +139,8 @@ type OfflineUnitRequest struct {
 
 // OfflineUnitData 表示聚光单元层级离线报表数据
 type OfflineUnitData struct {
-	DataList        []OfflineDataDTO `json:"data_list"`
-	AggregationData OfflineDataDTO   `json:"aggregation_data"`
+	DataList        []OfflineUnitDataDTO `json:"data_list"`
+	AggregationData OfflineUnitDataDTO   `json:"aggregation_data"`
 }
 
 // ListOfflineUnit 获取定向层级离线数据
