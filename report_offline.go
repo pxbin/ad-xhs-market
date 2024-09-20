@@ -24,23 +24,30 @@ type OfflineSearchWordRequest struct {
 
 // OfflineSearchWordData 表示聚光数据报表创意层级离线数据响应
 type OfflineSearchWordData struct {
-	Page            PageRespDTO          `json:"page"`
+	Page            PageResp             `json:"page"`
 	DataList        []OfflineCreativeDTO `json:"data_list"`
 	AggregationData OfflineCreativeDTO   `json:"aggregation_data"`
 }
 
+type OfflineSearchWordResponse struct {
+	ApiResp
+	Data OfflineSearchWordData `json:"data"`
+}
+
 // ListOfflineSearchWord 获取定向层级离线数据
-func (s *ReportService) ListOfflineSearchWord(ctx context.Context, req *OfflineSearchWordRequest, options ...RequestOption) (*OfflineSearchWordData, error) {
+func (s *ReportService) ListOfflineSearchWord(ctx context.Context, req *OfflineSearchWordRequest, options ...RequestOption) (*OfflineSearchWordResponse, error) {
 	path := "/api/open/jg/data/report/offline/search/word"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[OfflineSearchWordData](response.RawBody)
-	if err != nil {
+
+	result := &OfflineSearchWordResponse{}
+	if err := s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }
 
@@ -67,18 +74,25 @@ type OfflineAccountData struct {
 	AggregationData OfflineAccountDataDTO   `json:"aggregation_data"`
 }
 
+type ListOfflineAccountResponse struct {
+	ApiResp
+	Data OfflineAccountData `json:"data"`
+}
+
 // ListOfflineAccount 获取定向层级离线数据
-func (s *ReportService) ListOfflineAccount(ctx context.Context, req *OfflineAccountRequest, options ...RequestOption) (*OfflineAccountData, error) {
+func (s *ReportService) ListOfflineAccount(ctx context.Context, req *OfflineAccountRequest, options ...RequestOption) (*ListOfflineAccountResponse, error) {
 	path := "/api/open/jg/data/report/offline/account"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[OfflineAccountData](response.RawBody)
-	if err != nil {
+
+	result := &ListOfflineAccountResponse{}
+	if err := s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }
 
@@ -105,18 +119,25 @@ type OfflineCampaignData struct {
 	AggregationData OfflineCampaignDataDTO   `json:"aggregation_data"`
 }
 
+type ListOfflineCampaignResponse struct {
+	ApiResp
+	Data OfflineCampaignData `json:"data"`
+}
+
 // ListOfflineCampaign 获取定向层级离线数据
-func (s *ReportService) ListOfflineCampaign(ctx context.Context, req *OfflineCampaignRequest, options ...RequestOption) (*OfflineCampaignData, error) {
+func (s *ReportService) ListOfflineCampaign(ctx context.Context, req *OfflineCampaignRequest, options ...RequestOption) (*ListOfflineCampaignResponse, error) {
 	path := "/api/open/jg/data/report/offline/campaign"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[OfflineCampaignData](response.RawBody)
-	if err != nil {
+
+	result := &ListOfflineCampaignResponse{}
+	if err := s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }
 
@@ -143,8 +164,13 @@ type OfflineUnitData struct {
 	AggregationData OfflineUnitDataDTO   `json:"aggregation_data"`
 }
 
+type ListOfflineUnitResponse struct {
+	ApiResp
+	Data OfflineUnitData `json:"data"`
+}
+
 // ListOfflineUnit 获取定向层级离线数据
-func (s *ReportService) ListOfflineUnit(ctx context.Context, req *OfflineUnitRequest, options ...RequestOption) (*OfflineUnitData, error) {
+func (s *ReportService) ListOfflineUnit(ctx context.Context, req *OfflineUnitRequest, options ...RequestOption) (*ListOfflineUnitResponse, error) {
 	path := "/api/open/jg/data/report/offline/unit"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
@@ -152,10 +178,11 @@ func (s *ReportService) ListOfflineUnit(ctx context.Context, req *OfflineUnitReq
 		return nil, err
 	}
 
-	result, err := unmarshalApiResult[OfflineUnitData](response.RawBody)
-	if err != nil {
+	result := &ListOfflineUnitResponse{}
+	if err := s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }
 
@@ -184,18 +211,25 @@ type OfflineCreativeData struct {
 	AggregationData OfflineCreativeDTO   `json:"aggregation_data"`
 }
 
-// ListOfflineCreativty 获取定向层级离线数据
-func (s *ReportService) ListOfflineCreativty(ctx context.Context, req *OfflineCreativtyRequest, options ...RequestOption) (*OfflineCreativeData, error) {
+type ListOfflineCreativityResponse struct {
+	ApiResp
+	Data OfflineCreativeData `json:"data"`
+}
+
+// ListOfflineCreativity 获取定向层级离线数据
+func (s *ReportService) ListOfflineCreativity(ctx context.Context, req *OfflineCreativtyRequest, options ...RequestOption) (*ListOfflineCreativityResponse, error) {
 	path := "/api/open/jg/data/report/offline/creative"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[OfflineCreativeData](response.RawBody)
-	if err != nil {
+
+	result := &ListOfflineCreativityResponse{}
+	if err := s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }
 
@@ -223,8 +257,13 @@ type OfflinekeywordData struct {
 	AggregationData OfflineKeywordDataDTO   `json:"aggregation_data"`
 }
 
+type ListOfflinekeywordResponse struct {
+	ApiResp
+	Data OfflinekeywordData `json:"data"`
+}
+
 // ListOfflinekeyword 获取定向层级离线数据
-func (s *ReportService) ListOfflinekeyword(ctx context.Context, req *OfflinekeywordRequest, options ...RequestOption) (*OfflinekeywordData, error) {
+func (s *ReportService) ListOfflinekeyword(ctx context.Context, req *OfflinekeywordRequest, options ...RequestOption) (*ListOfflinekeywordResponse, error) {
 	path := "/api/open/jg/data/report/offline/keyword"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
@@ -232,9 +271,10 @@ func (s *ReportService) ListOfflinekeyword(ctx context.Context, req *Offlinekeyw
 		return nil, err
 	}
 
-	result, err := unmarshalApiResult[OfflinekeywordData](response.RawBody)
-	if err != nil {
+	result := &ListOfflinekeywordResponse{}
+	if err := s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }

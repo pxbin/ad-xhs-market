@@ -13,15 +13,16 @@ type ProgrammaticCreateRequest struct {
 }
 
 // ProgrammaticCreate 创建程序化创意
-func (s *CreativityService) ProgrammaticCreate(ctx context.Context, req *ProgrammaticCreateRequest, options ...RequestOption) (*CreativityIdData, error) {
+func (s *CreativityService) ProgrammaticCreate(ctx context.Context, req *ProgrammaticCreateRequest, options ...RequestOption) (*CreateCreativityResponse, error) {
 	path := "/api/open/jg/creativity/programmatic/page/create"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[CreativityIdData](response.RawBody)
-	if err != nil {
+
+	result := &CreateCreativityResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil

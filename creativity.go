@@ -12,12 +12,12 @@ type (
 
 	// CreativityIdData 创意Id
 	CreativityIdData struct {
-		Id int64 `json:"creativity_id"`
+		CreativityId int64 `json:"creativity_id"`
 	}
 
 	// CreativityIdsData 创意Id集合
 	CreativityIdsData struct {
-		Ids []int64 `json:"creativity_id"`
+		CreativityIds []int64 `json:"creativity_ids"`
 	}
 
 	// QualInfo 资质信息
@@ -66,6 +66,11 @@ type (
 	}
 )
 
+type CreateCreativityResponse struct {
+	ApiResp
+	Data CreativityIdData `json:"data"`
+}
+
 type CreativityUpdateRequest struct {
 	AdvertiserId            int64          `json:"advertiser_id"`                       // 是	广告主id
 	CreativityId            int64          `json:"creativity_id"`                       // 是	创意id
@@ -90,16 +95,22 @@ type CreativityUpdateRequest struct {
 	FallBackJumpUrl         string         `json:"fall_back_jump_url,omitempty"`        // 否	唤端下，兜底链接
 }
 
+type UpdateCreativityResponse struct {
+	ApiResp
+	Data CreativityIdData `json:"data"`
+}
+
 // Update 编辑创意
-func (s *CreativityService) Update(ctx context.Context, req *CreativityUpdateRequest, options ...RequestOption) (*interface{}, error) {
+func (s *CreativityService) Update(ctx context.Context, req *CreativityUpdateRequest, options ...RequestOption) (*UpdateCreativityResponse, error) {
 	path := "/api/open/jg/creativity/update"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[interface{}](response.RawBody)
-	if err != nil {
+
+	result := &UpdateCreativityResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -115,15 +126,21 @@ type UpdateCreativityStatusData struct {
 	CampaignIds []int64 `json:"campaign_ids"`
 }
 
-func (s *CreativityService) UpdateStatus(ctx context.Context, req *UpdateCampaignStatusRequest, options ...RequestOption) (*CreativityIdsData, error) {
+type UpdateCreativityStatusResponse struct {
+	ApiResp
+	Data UpdateCreativityStatusData `json:"data"`
+}
+
+func (s *CreativityService) UpdateStatus(ctx context.Context, req *UpdateCampaignStatusRequest, options ...RequestOption) (*UpdateCreativityStatusResponse, error) {
 	path := "/api/open/jg/creativity/status/update"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[CreativityIdsData](response.RawBody)
-	if err != nil {
+
+	result := &UpdateCreativityStatusResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -189,19 +206,25 @@ type CreativityData struct {
 }
 
 type ListCreativityData struct {
-	Page         PageRespDTO      `json:"page"`
+	Page         PageResp         `json:"page"`
 	Creativities []CreativityData `json:"creativity_dtos"`
 }
 
-func (s *CreativityService) List(ctx context.Context, req *ListCampaignRequest, options ...RequestOption) (*ListCreativityData, error) {
+type ListListCreativityResponse struct {
+	ApiResp
+	Data ListCreativityData `json:"data"`
+}
+
+func (s *CreativityService) List(ctx context.Context, req *ListCampaignRequest, options ...RequestOption) (*ListListCreativityResponse, error) {
 	path := "/api/open/jg/creativity/search"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[ListCreativityData](response.RawBody)
-	if err != nil {
+
+	result := &ListListCreativityResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil

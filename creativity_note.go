@@ -32,15 +32,16 @@ type CreativityNoteCreateRequest struct {
 }
 
 // CreativityNoteCreate 创建笔记创意
-func (s *CreativityService) CreativityNoteCreate(ctx context.Context, req *CreativityNoteCreateRequest, options ...RequestOption) (*CreativityIdData, error) {
+func (s *CreativityService) CreativityNoteCreate(ctx context.Context, req *CreativityNoteCreateRequest, options ...RequestOption) (*CreateCreativityResponse, error) {
 	path := "/api/open/jg/creativity/note/create"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[CreativityIdData](response.RawBody)
-	if err != nil {
+
+	result := &CreateCreativityResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil

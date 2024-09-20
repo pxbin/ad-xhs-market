@@ -33,9 +33,6 @@ var (
 )
 
 type Client struct {
-	appid  int32
-	secret string
-
 	config *Config
 
 	common service
@@ -56,6 +53,8 @@ type service struct {
 
 type Config struct {
 	BaseURL          *url.URL
+	AppId            int
+	AppSecret        string
 	HttpClient       *http.Client
 	EnableTokenCache bool
 	TokenCache       Cache
@@ -190,7 +189,19 @@ func (c *Client) Do(ctx context.Context, req *http.Request, httpClient *http.Cli
 		return nil, err
 	}
 
-	return &Response{Response: resp, RawBody: bs}, err
+	response := &Response{Response: resp, RawBody: bs}
+
+	var apiResp ApiResp
+	err = json.Unmarshal(response.RawBody, &apiResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := apiResp.CheckResult(); err != nil {
+		return nil, err
+	}
+
+	return response, err
 }
 
 // sanitizeURL redacts the client parameter from the URL which may be
@@ -208,15 +219,53 @@ func sanitizeURL(u *url.URL) *url.URL {
 
 type ClientOption func(conf *Config)
 
-func NewClient(appId int32, secret string, opts ...ClientOption) *Client {
-	config := &Config{}
+func WithEnableTokenCache(enableTokenCache bool) ClientOption {
+	return func(config *Config) {
+		config.EnableTokenCache = enableTokenCache
+	}
+}
+
+func WithTokenCache(cache Cache) ClientOption {
+	return func(config *Config) {
+		config.TokenCache = cache
+	}
+}
+
+func WithHttpClient(httpClient *http.Client) ClientOption {
+	return func(config *Config) {
+		config.HttpClient = httpClient
+	}
+}
+
+func WithHeaders(header http.Header) ClientOption {
+	return func(config *Config) {
+		config.Header = header
+	}
+}
+
+func WithUserAgent(userAgent string) ClientOption {
+	return func(config *Config) {
+		config.UserAgent = userAgent
+	}
+}
+
+func WithTimeout(timeout time.Duration) ClientOption {
+	return func(config *Config) {
+		config.Timeout = timeout
+	}
+}
+
+func NewClient(appId int, secret string, opts ...ClientOption) *Client {
+	adBaseURL, _ := url.Parse(baseURL)
+
+	config := &Config{
+		BaseURL:   adBaseURL,
+		AppId:     appId,
+		AppSecret: secret,
+	}
 
 	for _, opt := range opts {
 		opt(config)
-	}
-
-	if config.BaseURL == nil {
-		config.BaseURL, _ = url.Parse(baseURL)
 	}
 
 	if config.HttpClient == nil {
@@ -227,11 +276,7 @@ func NewClient(appId int32, secret string, opts ...ClientOption) *Client {
 		}
 	}
 
-	c := &Client{
-		appid:  appId,
-		secret: secret,
-		config: config,
-	}
+	c := &Client{config: config}
 
 	c.common.client = c
 	c.Auth = (*AuthService)(&c.common)
@@ -245,25 +290,6 @@ func NewClient(appId int32, secret string, opts ...ClientOption) *Client {
 	return c
 }
 
-type ApiResult[T interface{}] struct {
-	Code      int     `json:"code"`
-	Msg       string  `json:"msg"`
-	Data      T       `json:"data"`
-	Success   bool    `json:"success"`
-	RequestId *string `json:"request_id,omitempty"`
-}
-
-func (a *ApiResult[T]) IsSuccess() bool {
-	return a.Success && (a.Code == 0 || a.Code == 200)
-}
-
-func (a *ApiResult[T]) CheckResult() error {
-	if a.IsSuccess() {
-		return nil
-	}
-	return fmt.Errorf("code: %d, msg: %s", a.Code, a.Msg)
-}
-
 type Response struct {
 	*http.Response
 	// Body is the response body.
@@ -271,33 +297,6 @@ type Response struct {
 }
 
 var emptyPlaceholderRegx = regexp.MustCompile(`^\"-\"$`)
-
-func unmarshalApiResult[T interface{}](body []byte) (*T, error) {
-	str := strings.ReplaceAll(string(body), "%", "")
-	str = string(emptyPlaceholderRegx.ReplaceAll([]byte(str), []byte(`null`)))
-	str = strings.ReplaceAll(str, `"-"`, `"0"`)
-	if str == "" || str == "null" || str == "{}" || str == "[]" {
-		return nil, fmt.Errorf("请求响应无效，请检查Cookie是否失效")
-	}
-	result := &ApiResult[T]{}
-	err := json.Unmarshal(([]byte)(str), result)
-	if err != nil {
-		return nil, err
-	}
-	if err := result.CheckResult(); err != nil {
-		return nil, err
-	}
-	return &result.Data, nil
-}
-
-func UnmarshalApiResult[T interface{}](body []byte) (*ApiResult[T], error) {
-	result := &ApiResult[T]{}
-	err := json.Unmarshal(body, result)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
 
 func (c *Client) JSONUnmarshalBody(r *Response, v interface{}) error {
 	if !strings.Contains(r.Header.Get(hdrContentTypeKey), contentTypeJSON) {
@@ -316,12 +315,29 @@ func (c *Client) JSONUnmarshalBody(r *Response, v interface{}) error {
 	return nil
 }
 
-// BaseResp 请求API响应通用字段
-type BaseResp struct {
+// ApiResp 请求API响应通用字段
+type ApiResp struct {
 	Code      int    `json:"code"`                 // 返回码
 	Msg       string `json:"msg"`                  // 返回信息
 	Success   bool   `json:"success"`              // 接口是否成功
 	RequestId string `json:"request_id,omitempty"` // 请求Id
+}
+
+func (a *ApiResp) IsSuccess() bool {
+	return a.Success && (a.Code == 0 || a.Code == 200)
+}
+
+func (a *ApiResp) CheckResult() error {
+	if a.IsSuccess() {
+		return nil
+	}
+	return fmt.Errorf("code: %d, msg: %s", a.Code, a.Msg)
+}
+
+// PageResp 分页信息
+type PageResp struct {
+	PageIndex  int `json:"page_index"`  // 页码
+	TotalCount int `json:"total_count"` // 总数量
 }
 
 // ListOptions specifies the optional parameters to various List methods that
@@ -332,10 +348,4 @@ type ListOptions struct {
 	PageSize     int    `json:"page_size,omitempty"` // 否	页大小，默认20,最大100
 	StartDate    string `json:"start_date"`          // 是	开始时间，格式 yyyy-MM-dd	示例：2023-09-20
 	EndDate      string `json:"end_date"`            // 是	结束时间，格式 yyyy-MM-dd	示例：2023-09-21
-}
-
-// PageRespDTO 分页信息
-type PageRespDTO struct {
-	PageIndex  int `json:"page_index"`  // 页码
-	TotalCount int `json:"total_count"` // 总数量
 }

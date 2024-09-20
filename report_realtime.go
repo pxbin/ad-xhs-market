@@ -15,8 +15,8 @@ type TargetDTO struct {
 
 // RealtimeTargetResponse 表示聚光数据报表定向层级实时数据响应
 type RealtimeTargetResponse struct {
-	BaseResp
-	Page       PageRespDTO   `json:"page"`        // 分页信息
+	ApiResp
+	Page       PageResp      `json:"page"`        // 分页信息
 	TotalData  DataReportDTO `json:"total_data"`  // 汇总数据
 	TargetDTOs []TargetDTO   `json:"target_dtos"` // 定向数据
 }
@@ -55,7 +55,7 @@ type RealtimeAccountRequest struct {
 
 // RealtimeAccountResponse 表示聚光数据报表账户层级实时数据响应
 type RealtimeAccountResponse struct {
-	BaseResp
+	ApiResp
 	Data       DataReportDTO   `json:"data"`
 	HourlyData []DataReportDTO `json:"hourly_data"` // 小时数据
 }
@@ -108,8 +108,8 @@ type CampaignDTO struct {
 
 // RealtimeCampaignResponse 表示聚光数据报表计划层级实时数据响应
 type RealtimeCampaignResponse struct {
-	BaseResp
-	Page         PageRespDTO   `json:"page"`
+	ApiResp
+	Page         PageResp      `json:"page"`
 	TotalData    DataReportDTO `json:"total_data"`    // 汇总数据
 	CampaignDTOs []CampaignDTO `json:"campaign_dtos"` // 计划数据list
 }
@@ -158,8 +158,8 @@ type UnitDTO struct {
 
 // RealtimeUnitResponse 表示聚光数据报表单元层级实时数据响应
 type RealtimeUnitResponse struct {
-	BaseResp
-	Page      PageRespDTO   `json:"page"`
+	ApiResp
+	Page      PageResp      `json:"page"`
 	TotalData DataReportDTO `json:"total_data"` // 汇总数据
 	UnitDTOs  []UnitDTO     `json:"unit_dtos"`  // 单元数据list
 }
@@ -207,8 +207,8 @@ type CreativityDTO struct {
 
 // RealtimeCreativityResponse 表示聚光数据报表创意层级实时数据响应
 type RealtimeCreativityResponse struct {
-	BaseResp
-	Page           PageRespDTO     `json:"page"`
+	ApiResp
+	Page           PageResp        `json:"page"`
 	TotalData      DataReportDTO   `json:"total_data"` // 汇总数据
 	CreativityDTOs []CreativityDTO `json:"creativity_dtos"`
 }
@@ -254,8 +254,8 @@ type KeywordDTO struct {
 
 // RealtimeKeywordResponse 表示聚光数据报表关键词层级实时数据响应
 type RealtimeKeywordResponse struct {
-	BaseResp
-	Page        PageRespDTO   `json:"page"`
+	ApiResp
+	Page        PageResp      `json:"page"`
 	TotalData   DataReportDTO `json:"total_data"`   // 汇总数据
 	KeywordDTOs []KeywordDTO  `json:"keyword_dtos"` // 关键词数据list
 }

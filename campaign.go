@@ -68,15 +68,21 @@ type CampaignIdData struct {
 	CampaignId int64 `json:"campaign_id"` // 计划id
 }
 
-func (s *CampaignService) Create(ctx context.Context, req *CampaignCreateRequest, options ...RequestOption) (*CampaignIdData, error) {
+type CreateCampaignResponse struct {
+	ApiResp
+	Data CampaignIdData `json:"data"`
+}
+
+func (s *CampaignService) Create(ctx context.Context, req *CampaignCreateRequest, options ...RequestOption) (*CreateCampaignResponse, error) {
 	path := "/api/open/jg/campaign/create"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[CampaignIdData](response.RawBody)
-	if err != nil {
+
+	result := &CreateCampaignResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -106,15 +112,21 @@ type CampaignUpdateRequest struct {
 	DetectURLLink         string      `json:"detect_url_link,omitempty"`         // 否	监测链接	唤端场景下需要关注。optimize_target如果是35、36、37、38，则必填
 }
 
-func (s *CampaignService) Update(ctx context.Context, req *CampaignUpdateRequest, options ...RequestOption) (*CampaignIdData, error) {
+type UpdateCampaignResponse struct {
+	ApiResp
+	Data CampaignIdData `json:"data"`
+}
+
+func (s *CampaignService) Update(ctx context.Context, req *CampaignUpdateRequest, options ...RequestOption) (*UpdateCampaignResponse, error) {
 	path := "/api/open/jg/campaign/update"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[CampaignIdData](response.RawBody)
-	if err != nil {
+
+	result := &UpdateCampaignResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -130,15 +142,21 @@ type UpdateCampaignStatusData struct {
 	CampaignIds []int64 `json:"campaign_ids"`
 }
 
-func (s *CampaignService) UpdateStatus(ctx context.Context, req *UpdateCampaignStatusRequest, options ...RequestOption) (*UpdateCampaignStatusData, error) {
+type UpdateCampaignStatusResponse struct {
+	ApiResp
+	Data UpdateCampaignStatusData `json:"data"`
+}
+
+func (s *CampaignService) UpdateStatus(ctx context.Context, req *UpdateCampaignStatusRequest, options ...RequestOption) (*UpdateCampaignStatusResponse, error) {
 	path := "/api/open/jg/campaign/status/update"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[UpdateCampaignStatusData](response.RawBody)
-	if err != nil {
+
+	result := &UpdateCampaignStatusResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -195,15 +213,21 @@ type ListCampaignData struct {
 	Campaigns []CampaignData `json:"base_campaign_dtos"`
 }
 
-func (s *CampaignService) List(ctx context.Context, req *ListCampaignRequest, options ...RequestOption) (*CampaignIdData, error) {
+type ListCampaignResponse struct {
+	ApiResp
+	Data ListCampaignData `json:"data"`
+}
+
+func (s *CampaignService) List(ctx context.Context, req *ListCampaignRequest, options ...RequestOption) (*ListCampaignResponse, error) {
 	path := "/api/open/jg/campaign/list"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[CampaignIdData](response.RawBody)
-	if err != nil {
+
+	result := &ListCampaignResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil

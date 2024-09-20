@@ -13,15 +13,16 @@ type CreativityPageCreateRequest struct {
 }
 
 // CreativityPageCreate 创建落地页创意
-func (s *CreativityService) CreativityPageCreate(ctx context.Context, req *CreativityNoteCreateRequest, options ...RequestOption) (*CreativityIdsData, error) {
+func (s *CreativityService) CreativityPageCreate(ctx context.Context, req *CreativityNoteCreateRequest, options ...RequestOption) (*CreateCreativityResponse, error) {
 	path := "/api/open/jg/creativity/page/create"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[CreativityIdsData](response.RawBody)
-	if err != nil {
+
+	result := &CreateCreativityResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil

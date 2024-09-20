@@ -68,16 +68,22 @@ type AccountAdOrderData struct {
 	List  []AdCampaignTradeDetail `json:"ad_campaign_trade_detail"` // 计划流水详情
 }
 
-// ListAdOrders 获取账户计划流水
-func (s *AccountService) ListAdOrders(ctx context.Context, req *AccountAdOrderRequest, options ...RequestOption) (*AccountAdOrderData, error) {
+type ListAdOrderResponse struct {
+	ApiResp
+	Data AccountAdOrderData `json:"data"`
+}
+
+// ListAdOrder 获取账户计划流水
+func (s *AccountService) ListAdOrder(ctx context.Context, req *AccountAdOrderRequest, options ...RequestOption) (*ListAdOrderResponse, error) {
 	path := "/api/open/jg/account/ad/order/info"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[AccountAdOrderData](response.RawBody)
-	if err != nil {
+
+	result := &ListAdOrderResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -99,23 +105,34 @@ type AccountOrderData struct {
 	List           []AccountTradeDetail `json:"account_trade_detail"` // 计划流水详情
 }
 
+type ListOrderResponse struct {
+	ApiResp
+	Data AccountOrderData `json:"data"`
+}
+
 // ListOrders 获取账户流水
-func (s *AccountService) ListOrders(ctx context.Context, req *AccountOrderRequest, options ...RequestOption) (*AccountOrderData, error) {
+func (s *AccountService) ListOrders(ctx context.Context, req *AccountOrderRequest, options ...RequestOption) (*ListOrderResponse, error) {
 	path := "/api/open/jg/account/order/info"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[AccountOrderData](response.RawBody)
-	if err != nil {
+
+	result := &ListOrderResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
+type AccountBudgetResponse struct {
+	ApiResp
+	Data AccountBudgetData `json:"data"`
+}
+
 // Budget 获取账户日预算余额
-func (s *AccountService) Budget(ctx context.Context, advertiserId int32, options ...RequestOption) (*AccountBudgetData, error) {
+func (s *AccountService) Budget(ctx context.Context, advertiserId int32, options ...RequestOption) (*AccountBudgetResponse, error) {
 	path := "/api/open/jg/account/budget/info"
 	body := map[string]interface{}{"advertiser_id": advertiserId}
 
@@ -123,15 +140,21 @@ func (s *AccountService) Budget(ctx context.Context, advertiserId int32, options
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[AccountBudgetData](response.RawBody)
-	if err != nil {
+
+	result := &AccountBudgetResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
+type AccountWhiteListResponse struct {
+	ApiResp
+	Data WhiteListData `json:"data"`
+}
+
 // WhiteList 账户白名单
-func (s *AccountService) WhiteList(ctx context.Context, advertiserId int32, options ...RequestOption) (*WhiteListData, error) {
+func (s *AccountService) WhiteList(ctx context.Context, advertiserId int32, options ...RequestOption) (*AccountWhiteListResponse, error) {
 	path := "/api/open/jg/white/list"
 	body := map[string]interface{}{"advertiser_id": advertiserId}
 
@@ -139,8 +162,9 @@ func (s *AccountService) WhiteList(ctx context.Context, advertiserId int32, opti
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[WhiteListData](response.RawBody)
-	if err != nil {
+
+	result := &AccountWhiteListResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil

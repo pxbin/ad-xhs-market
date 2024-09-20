@@ -259,7 +259,12 @@ type NoteDataRequest struct {
 	DateKey   string `json:"date_key"`   //日期（格式yyyyMMdd），获取最新数据时不传该参数，可以支持历史三天的数据拉取，小红星数据为T+2，其他数据可以支持T+1
 }
 
-func (s *NoteService) ListNotePostData(ctx context.Context, req *NoteDataRequest, options ...RequestOption) (*NotePostData, error) {
+type ListNotePostResponse struct {
+	ApiResp
+	Data NotePostData `json:"data"`
+}
+
+func (s *NoteService) ListNotePostData(ctx context.Context, req *NoteDataRequest, options ...RequestOption) (*ListNotePostResponse, error) {
 	path := "/api/open/pgy/note/post/data"
 
 	// apiReq.Body = map[string]interface{}{"user_id": userId, "date_type": 2, "start_time": "2024-08-01", "end_time": "2024-08-16", "page_num": 1, "page_size": 100}
@@ -270,9 +275,9 @@ func (s *NoteService) ListNotePostData(ctx context.Context, req *NoteDataRequest
 		return nil, err
 	}
 
-	data, err := unmarshalApiResult[NotePostData](response.RawBody)
-	if err != nil {
+	result := &ListNotePostResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
-	return data, nil
+	return result, nil
 }

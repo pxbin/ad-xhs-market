@@ -32,9 +32,8 @@ type (
 		TargetTemplateId    int64            `json:"target_template_id,omitempty"`     // 否	定向包id
 	}
 
-	// UnitIdDTO 计划id
-	UnitIdDTO struct {
-		UnitIdDTO int64 `json:"unit_id"`
+	UnitIdData struct {
+		UnitId int64 `json:"unit_id"`
 	}
 
 	SpuNoteConfig struct {
@@ -138,15 +137,20 @@ type UnitCreateRequest struct {
 	TargetTemplateId    int64            `json:"target_template_id,omitempty"`     // 否	定向包id
 }
 
-func (s *UnitService) Create(ctx context.Context, req *UnitCreateRequest, options ...RequestOption) (*UnitIdDTO, error) {
+type CreateUnitRepsonse struct {
+	ApiResp
+	Data UnitIdData `json:"data"`
+}
+
+func (s *UnitService) Create(ctx context.Context, req *UnitCreateRequest, options ...RequestOption) (*CreateUnitRepsonse, error) {
 	path := "/api/open/jg/unit/create"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[UnitIdDTO](response.RawBody)
-	if err != nil {
+	result := &CreateUnitRepsonse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -176,15 +180,21 @@ type UnitUpdateRequest struct {
 	TargetTemplateId    int64            `json:"target_template_id,omitempty"`     // 否	定向包id
 }
 
-func (s *UnitService) Update(ctx context.Context, req *UnitUpdateRequest, options ...RequestOption) (*UnitIdDTO, error) {
+type UpdateUnitRepsonse struct {
+	ApiResp
+	Data UnitIdData `json:"data"`
+}
+
+func (s *UnitService) Update(ctx context.Context, req *UnitUpdateRequest, options ...RequestOption) (*UpdateUnitRepsonse, error) {
 	path := "/api/open/jg/unit/update"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[UnitIdDTO](response.RawBody)
-	if err != nil {
+
+	result := &UpdateUnitRepsonse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -200,15 +210,20 @@ type UpdateUnitStatusData struct {
 	UnitIds []int64 `json:"unit_ids"`
 }
 
-func (s *UnitService) UpdateStatus(ctx context.Context, req *UpdateUnitStatusRequest, options ...RequestOption) (*UpdateUnitStatusData, error) {
+type UpdateUnitStatusResponse struct {
+	ApiResp
+	Data UpdateUnitStatusData `json:"data"` // 业务数据
+}
+
+func (s *UnitService) UpdateStatus(ctx context.Context, req *UpdateUnitStatusRequest, options ...RequestOption) (*UpdateUnitStatusResponse, error) {
 	path := "/api/open/jg/unit/status/update"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[UpdateUnitStatusData](response.RawBody)
-	if err != nil {
+	result := &UpdateUnitStatusResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -263,15 +278,21 @@ type ListUnitData struct {
 	UnitInfos  []UnitData `json:"unit_infos"`  // 单元信息
 }
 
-func (s *UnitService) List(ctx context.Context, req *ListUnitRequest, options ...RequestOption) (*ListUnitData, error) {
-	path := "/api/open/jg/campaign/list"
+type ListUnitResponse struct {
+	ApiResp
+	Data ListUnitData `json:"data"` // 业务数据
+}
+
+func (s *UnitService) List(ctx context.Context, req *ListUnitRequest, options ...RequestOption) (*ListUnitResponse, error) {
+	path := "/api/open/jg/unit/list"
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, req, nil, options...)
 	if err != nil {
 		return nil, err
 	}
-	result, err := unmarshalApiResult[ListUnitData](response.RawBody)
-	if err != nil {
+
+	result := &ListUnitResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
 	return result, nil

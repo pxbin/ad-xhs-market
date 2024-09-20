@@ -39,36 +39,41 @@ type AccessTokenData struct {
 	UpdateTime            int64        `json:"update_time"`              // 授权记录更新时间
 }
 
+type AccessTokenResponse struct {
+	ApiResp
+	Data AccessTokenData `json:"data"`
+}
+
 // AccessToken 获取Oauth2.0 token
-func (s *AuthService) AccessToken(ctx context.Context, authCode string, options ...RequestOption) (*AccessTokenData, error) {
+func (s *AuthService) AccessToken(ctx context.Context, authCode string, options ...RequestOption) (*AccessTokenResponse, error) {
 	path := "/api/open/oauth2/access_token"
-	body := map[string]interface{}{"app_id": s.client.appid, "secret": s.client.secret, "auth_code": authCode}
+	body := map[string]interface{}{"app_id": s.client.config.AppId, "secret": s.client.config.AppSecret, "auth_code": authCode}
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, body, nil, options...)
 	if err != nil {
 		return nil, err
 	}
 
-	token, err := unmarshalApiResult[AccessTokenData](response.RawBody)
-	if err != nil {
+	result := &AccessTokenResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
-	return token, nil
+	return result, nil
 }
 
 // RefreshToken Token有效期&续期
-func (s *AuthService) RefreshToken(ctx context.Context, token string, options ...RequestOption) (*AccessTokenData, error) {
+func (s *AuthService) RefreshToken(ctx context.Context, token string, options ...RequestOption) (*AccessTokenResponse, error) {
 	path := "/api/open/oauth2/refresh_token"
-	body := map[string]interface{}{"app_id": s.client.appid, "secret": s.client.secret, "refresh_token": token}
+	body := map[string]interface{}{"app_id": s.client.config.AppId, "secret": s.client.config.AppSecret, "refresh_token": token}
 
 	response, err := s.client.Request(ctx, http.MethodPost, path, body, nil, options...)
 	if err != nil {
 		return nil, err
 	}
 
-	data, err := unmarshalApiResult[AccessTokenData](response.RawBody)
-	if err != nil {
+	result := &AccessTokenResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
-	return data, nil
+	return result, nil
 }

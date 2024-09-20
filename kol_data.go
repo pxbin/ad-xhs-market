@@ -24,7 +24,12 @@ type KolDetailData struct {
 	Items   []KolInfo `json:"datas"`
 }
 
-func (s *KolService) ListKolDetails(ctx context.Context, userId string, kolIds []string, options ...RequestOption) (*KolDetailData, error) {
+type ListKolDetailsResponse struct {
+	ApiResp
+	Data NotePostData `json:"data"`
+}
+
+func (s *KolService) ListKolDetails(ctx context.Context, userId string, kolIds []string, options ...RequestOption) (*ListKolDetailsResponse, error) {
 	path := "/api/open/pgy/kol/data/detail"
 	body := map[string]interface{}{"user_id": userId, "kol_ids": kolIds}
 
@@ -33,9 +38,9 @@ func (s *KolService) ListKolDetails(ctx context.Context, userId string, kolIds [
 		return nil, err
 	}
 
-	data, err := unmarshalApiResult[KolDetailData](response.RawBody)
-	if err != nil {
+	result := &ListKolDetailsResponse{}
+	if err = s.client.JSONUnmarshalBody(response, result); err != nil {
 		return nil, err
 	}
-	return data, nil
+	return result, nil
 }
